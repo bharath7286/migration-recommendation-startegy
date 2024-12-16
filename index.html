@@ -18,12 +18,27 @@
             <input type="text" id="serverId" placeholder="Enter server number" required>
             <button type="submit">Fetch Server Data</button>
         </form>
-        
+
         <!-- Data Display Section -->
         <div id="dataDisplay"></div>
 
-        <!-- Chart Section -->
-        <canvas id="barChart" style="display: none; margin-top: 20px;"></canvas>
+        <!-- Graphs Section for CPU Utilization, Storage, Network Utilization, and Cost -->
+        <div class="graphs-section">
+            <!-- Cost Utilization Graph -->
+            <div class="graph-container">
+                <canvas id="costGraph" style="display: none;"></canvas>
+                <div class="graph-label" id="costLabel"></div>
+            </div>
+
+            <!-- Migration Strategy Graph -->
+            <div class="graph-container">
+                <canvas id="strategyGraph" style="display: none;"></canvas>
+                <div class="graph-label" id="strategyLabel"></div>
+            </div>
+        </div>
+
+        <!-- Summary Message Section -->
+        <div id="summaryMessage"></div>
     </div>
 
     <!-- JavaScript -->
