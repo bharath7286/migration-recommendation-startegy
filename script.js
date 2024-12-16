@@ -1,18 +1,22 @@
-let barChartInstance = null; // To store the chart instance
+let costChartInstance = null;
+let strategyChartInstance = null;
 
 document.getElementById("serverForm").addEventListener("submit", function (event) {
     event.preventDefault();
 
     const serverId = document.getElementById("serverId").value.trim();
     const dataDisplay = document.getElementById("dataDisplay");
-    const errorDisplay = document.getElementById("error");
-    const barChartCanvas = document.getElementById("barChart");
 
-    // Clear previous results
-    dataDisplay.style.display = "none";
+    // Clear previous data and charts
     dataDisplay.innerHTML = "";
-    barChartCanvas.style.display = "none";
-    if (errorDisplay) errorDisplay.remove();
+    if (costChartInstance) {
+        costChartInstance.destroy();
+        costChartInstance = null;
+    }
+    if (strategyChartInstance) {
+        strategyChartInstance.destroy();
+        strategyChartInstance = null;
+    }
 
     // Validate input
     if (!serverId) {
@@ -20,30 +24,14 @@ document.getElementById("serverForm").addEventListener("submit", function (event
         return;
     }
 
-    // Fetch API Data
+    // Fetch data from API
     const apiUrl = `https://h5kyfx0mh2.execute-api.ap-southeast-2.amazonaws.com/dev/server-data/${serverId}`;
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
             const serverData = JSON.parse(data.body);
 
-            // Parse software
-            let softwareList = [];
-            try {
-                softwareList = JSON.parse(serverData.server.software);
-            } catch (e) {
-                console.error("Error parsing software data", e);
-            }
-
-            // Parse strategy_scores
-            let strategyScores = {};
-            try {
-                strategyScores = JSON.parse(serverData.server.strategy_scores);
-            } catch (e) {
-                console.error("Error parsing strategy scores", e);
-            }
-
-            // Generate Server Details Display
+            // Display Server Details
             dataDisplay.innerHTML = `
                 <h3>Server Details</h3>
                 <ul>
@@ -51,54 +39,75 @@ document.getElementById("serverForm").addEventListener("submit", function (event
                     <li><strong>CPU Utilization:</strong> ${serverData.server.cpu_utilization}%</li>
                     <li><strong>Memory Utilization:</strong> ${serverData.server.memory_utilization} MB</li>
                     <li><strong>Storage:</strong> ${serverData.server.storage} GB</li>
-                    <li><strong>Network Utilization:</strong> ${serverData.server.network_utilization}%</li>
-                    <li><strong>Cost:</strong> $${serverData.server.cost}</li>
-                    <li><strong>Instance Type:</strong> ${serverData.server.instance_type || "N/A"}</li>
-                    <li><strong>Primary Strategy:</strong> ${serverData.server.primary_strategy}</li>
-                    <li><strong>Software:</strong> ${softwareList.length > 0 ? softwareList.join(", ") : "None"}</li>
+                    <li><strong>Software Dependencies:</strong> ${serverData.server.software || "None"}</li>
                 </ul>
             `;
-            dataDisplay.style.display = "block";
 
-            // Prepare Bar Chart Data
-            if (Object.keys(strategyScores).length > 0) {
-                const chartLabels = Object.keys(strategyScores).map(label => label.replace('_', ' ').toUpperCase());
-                const chartValues = Object.values(strategyScores);
+            // Display Cost Graph
+            const costCanvas = document.getElementById("costGraph");
+            costCanvas.style.display = "block";
+            const costCtx = costCanvas.getContext("2d");
+            costChartInstance = new Chart(costCtx, {
+                type: "bar",
+                data: {
+                    labels: ["Cost"],
+                    datasets: [{
+                        label: "Cost ($)",
+                        data: [serverData.server.cost],
+                        backgroundColor: "rgba(197, 87, 153, 0.6)",
+                        borderColor: "rgb(235, 54, 54)",
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
 
-                // Destroy previous chart instance if it exists
-                if (barChartInstance) barChartInstance.destroy();
+            // Display Migration Strategy Graph
+            const strategyCanvas = document.getElementById("strategyGraph");
+            strategyCanvas.style.display = "block";
+            const strategyCtx = strategyCanvas.getContext("2d");
+            const strategyScores = JSON.parse(serverData.server.strategy_scores || "{}");
+            strategyChartInstance = new Chart(strategyCtx, {
+                type: "bar",
+                data: {
+                    labels: Object.keys(strategyScores),
+                    datasets: [{
+                        label: "Migration Strategy Scores",
+                        data: Object.values(strategyScores),
+                        backgroundColor: "rgba(112, 183, 241, 0.6)",
+                        borderColor: "rgb(122, 34, 246)",
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } }
+                }
+            });
 
-                // Display the bar chart
-                barChartCanvas.style.display = "block";
-                const ctx = barChartCanvas.getContext("2d");
-                barChartInstance = new Chart(ctx, {
-                    type: "bar",
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            label: "Strategy Scores",
-                            data: chartValues,
-                            backgroundColor: "rgba(75, 192, 192, 0.6)",
-                            borderColor: "rgba(75, 192, 192, 1)",
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
-                    }
-                });
-            }
+            // Display Cost Value and Migration Strategy
+            const costLabel = document.getElementById("costLabel");
+            costLabel.innerHTML = `<strong>Cost Value:</strong> $${serverData.server.cost}`;
+
+            const strategyLabel = document.getElementById("strategyLabel");
+            const highestStrategy = Object.keys(strategyScores).reduce((a, b) =>
+                strategyScores[a] > strategyScores[b] ? a : b
+            );
+            strategyLabel.innerHTML = `<strong>Primary Migration Strategy:</strong> ${highestStrategy}`;
+
+            // Summary Section
+            const summaryMessage = document.getElementById("summaryMessage");
+            summaryMessage.innerHTML = `
+                <p>Based on the analysis, we recommend a primary migration strategy of <strong>${highestStrategy}</strong> with an estimated cost of <strong>$${serverData.server.cost}</strong>.</p>
+            `;
         })
         .catch(error => {
-            const errorMessage = document.createElement("div");
-            errorMessage.id = "error";
-            errorMessage.textContent = `Error fetching data: ${error.message}`;
-            document.querySelector(".container").appendChild(errorMessage);
+            dataDisplay.innerHTML = `<div style="color: red;">Error fetching data: ${error.message}</div>`;
         });
 });
