@@ -47,6 +47,11 @@ document.getElementById("serverForm").addEventListener("submit", function (event
             const costCanvas = document.getElementById("costGraph");
             costCanvas.style.display = "block";
             const costCtx = costCanvas.getContext("2d");
+
+            if (costChartInstance) {
+                costChartInstance.destroy();  // Destroy the previous chart
+            }
+
             costChartInstance = new Chart(costCtx, {
                 type: "bar",
                 data: {
@@ -70,6 +75,11 @@ document.getElementById("serverForm").addEventListener("submit", function (event
             const strategyCanvas = document.getElementById("strategyGraph");
             strategyCanvas.style.display = "block";
             const strategyCtx = strategyCanvas.getContext("2d");
+
+            if (strategyChartInstance) {
+                strategyChartInstance.destroy();  // Destroy the previous chart
+            }
+
             const strategyScores = JSON.parse(serverData.server.strategy_scores || "{}");
             strategyChartInstance = new Chart(strategyCtx, {
                 type: "bar",
