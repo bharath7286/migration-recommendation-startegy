@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Data</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="container">
+        <h1>Server Details</h1>
+        <!-- Form to Enter Server ID -->
+        <form id="serverForm">
+            <input type="text" id="serverId" placeholder="Enter server number" required>
+            <button type="submit">Fetch Server Data</button>
+        </form>
+        
+        <!-- Data Display Section -->
+        <div id="dataDisplay"></div>
+
+        <!-- Chart Section -->
+        <canvas id="barChart" style="display: none; margin-top: 20px;"></canvas>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>

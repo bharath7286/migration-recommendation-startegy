@@ -1,0 +1,77 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #c751f5, #9df9ef);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: white;
+    position: relative;
+    overflow-y: auto;
+}
+
+/* Container Styling */
+.container {
+    text-align: center;
+    background-color: #0c0a0a;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 15px 30px #322c2e;
+    width: 400px;
+    backdrop-filter: blur(8px);
+    z-index: 10;
+    margin-top: 20px;
+    position: relative;
+}
+
+/* Heading */
+h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+/* Input Styles */
+input {
+    padding: 15px;
+    font-size: 16px;
+    margin: 15px 0;
+    width: 80%;
+    border-radius: 8px;
+    border: 2px solid #000000;
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgb(255, 255, 255);
+    transition: 0.3s ease;
+}
+
+input:focus {
+    border-color: #387fc6;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Button Styles */
+button {
+    padding: 12px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    background-color: #387fc6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+    background-color: #0a5ea8;
+   
